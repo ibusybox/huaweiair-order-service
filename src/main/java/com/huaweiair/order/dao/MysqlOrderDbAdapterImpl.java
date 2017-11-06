@@ -38,7 +38,8 @@ public class MysqlOrderDbAdapterImpl implements OrderDbAdapter {
   private String jdbcName = "com.mysql.jdbc.Driver";
   private String databaseName = "huaweiair_order";
   private String tableName = "huaweiair_order";
-  private Statement stmt;
+//  private Statement stmt;
+  private Connection con;
 
   public MysqlOrderDbAdapterImpl() {
     initDb();
@@ -83,7 +84,7 @@ public class MysqlOrderDbAdapterImpl implements OrderDbAdapter {
    * @param stmt
    */
   private void initDb() {
-
+	Statement stmt;
     try {
       Class.forName(jdbcName);
       LOGGER.info("DB driver load success.");
@@ -92,11 +93,12 @@ public class MysqlOrderDbAdapterImpl implements OrderDbAdapter {
     }
     try {
       LOGGER.info("Get DB connection start.");
-      Connection con = DriverManager.getConnection("jdbc:mysql://" + ip + ":" + port + "/", dbUserName, dbPassword);
+      con = DriverManager.getConnection("jdbc:mysql://" + ip + ":" + port + "/", dbUserName, dbPassword);
       LOGGER.info("Get DB connection success.");
       stmt = con.createStatement();
     } catch (SQLException e) {
       LOGGER.error("Get DB connection error: ", e);
+      return;
     }
 
     try {
@@ -116,21 +118,39 @@ public class MysqlOrderDbAdapterImpl implements OrderDbAdapter {
       } else {
         LOGGER.error("execute sql error: ", e);
       }
+    }finally{
+    	try {
+    		if (stmt != null) {
+    			stmt.close();
+    		}
+		} catch (SQLException e) {
+			LOGGER.error("closed statement error: ", e);
+		}
     }
   }
 
   @Override
   public boolean insertOrder(FlightOrder order) {
+	Statement stmt = null;
     String sql = "INSERT INTO " + tableName + " VALUES ('" + order.getOrderId() + "', " + "'" + order.getUserId()
         + "', '" + order.getFlightId() + "', '" + order.getName() + "', '" + order.getScheduledDepartureTime() + "', '"
         + order.getScheduledArrivalTime() + "', '" + order.getFlightClass() + "', '" + order.getFlightPrice() + "', '"
         + order.getOrderTime() + "', '" + order.getOrderStatus() + "')";
     try {
 
-      stmt.executeUpdate(sql);
+    	stmt = con.createStatement();
+    	stmt.executeUpdate(sql);
       return true;
     } catch (SQLException e) {
       LOGGER.error("insertOrder  error: ", e);
+    }finally{
+    	if (stmt != null) {
+    		try {
+				stmt.close();
+			} catch (SQLException e) {
+				LOGGER.error("close statement error: ", e);
+			}
+    	}
     }
     return false;
   }
@@ -138,32 +158,54 @@ public class MysqlOrderDbAdapterImpl implements OrderDbAdapter {
 
   @Override
   public boolean updateOrder(String orderId, int action) {
+	  Statement stmt = null;
     String sql = "UPDATE " + tableName + " SET orderstatus='" + action + "'  WHERE orderId='" + orderId + "'";
     try {
+      stmt = con.createStatement();
       stmt.executeUpdate(sql);
       return true;
     } catch (SQLException e) {
       LOGGER.error("updateOrder  error: ", e);
+    }finally {
+    	if (stmt != null) {
+    		try {
+				stmt.close();
+			} catch (SQLException e) {
+				LOGGER.error("close statement error: ", e);
+			}
+    	}
     }
     return false;
   }
 
   @Override
   public boolean deleteOrder(String orderId) {
+	  Statement stmt = null;
     String sql = "DELETE FROM " + tableName + " WHERE orderId='" + orderId + "'";
     try {
+       stmt = con.createStatement();
       stmt.executeUpdate(sql);
       return true;
     } catch (SQLException e) {
       LOGGER.error("deleteOrder  error: ", e);
+    }finally{
+    	if (stmt != null) {
+    		try {
+				stmt.close();
+			} catch (SQLException e) {
+				 LOGGER.error("close statement error: ", e);
+			}
+    	}
     }
     return false;
   }
 
   @Override
   public FlightOrder[] queryOrders(String userId) {
+	  Statement stmt = null;
     String sql = "SELECT * FROM " + tableName + " WHERE userId='" + userId + "'";
     try {
+       stmt = con.createStatement();
       ResultSet re = stmt.executeQuery(sql);
       List<?> reList = populate(re, FlightOrder.class);
       if (null == reList || reList.isEmpty()) {
@@ -176,6 +218,14 @@ public class MysqlOrderDbAdapterImpl implements OrderDbAdapter {
       LOGGER.error("queryOrders  error: ", e);
     } catch (IllegalAccessException e) {
       LOGGER.error("queryOrders  error: ", e);
+    }finally{
+    	if (stmt != null) {
+    		try {
+				stmt.close();
+			} catch (SQLException e) {
+				LOGGER.error("close statement error", e);
+			}
+    	}
     }
     return new FlightOrder[] {};
   }
