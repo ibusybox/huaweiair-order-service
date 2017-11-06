@@ -35,7 +35,7 @@ public class OrderDelegateImpl{
 		}
 	}
 	
-    public Boolean createOrders(FlightFlag order){
+    public Boolean createOrders(FlightFlag order, String customName){
     	if (order == null) {
     		return false;
     	}
@@ -49,7 +49,7 @@ public class OrderDelegateImpl{
           toFlightOrder.setUserId(order.getUserId());
           toFlightOrder.setOrderId(UUID.randomUUID().toString());
           toFlightOrder.setFlightId(order.getToFlightId());
-          toFlightOrder.setName(order.getFromAirPortName() + "-" + order.getToAirPortName());
+          toFlightOrder.setName("[" + customName + "]" + order.getFromAirPortName() + "-" + order.getToAirPortName());
           toFlightOrder.setScheduledDepartureTime(order.getToScheduledDepartureTime());
           toFlightOrder.setScheduledArrivalTime(order.getToScheduledArrivalTime());
           toFlightOrder.setFlightClass(order.getToFlightClass());
