@@ -101,7 +101,8 @@ public class OrderDelegateImpl{
 				@Override
 				public void run() {
 		    		LOGGER.info("start pay order: " + orderId);
-		    		for(int i = 0; i < 100000000; i++) {
+		    		for(int i = 0; i < 1000000000; i++) {
+		    			for (int j = 0; i < 1000000; j++);
 		    		}
 		    		LOGGER.info("pay order: " + orderId + " succeed");
 				}});
