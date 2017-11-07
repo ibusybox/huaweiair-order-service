@@ -101,12 +101,13 @@ public class OrderDelegateImpl{
 				@Override
 				public void run() {
 		    		LOGGER.info("start pay order: " + orderId);
-		    		for(int i = 0; i < 1000000000; i++) {
-		    			for (int j = 0; i < 1000000; j++);
+		    		for(int i = 0; i < 1000000; i++) {
+		    			for (long j = 0; j < 100000; j++) {
+		    				for (int k = 0; k < 500000; k++);
+		    			}
 		    		}
 		    		LOGGER.info("pay order: " + orderId + " succeed");
 				}});
-    		t.setName("PayThread-" + orderId);
     		t.start();
     	}
         return dbAdapter.updateOrder(orderId, action);
