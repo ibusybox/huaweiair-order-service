@@ -97,7 +97,9 @@ public class OrderDelegateImpl{
     	//pay, simulate pay operation, cost some cpus
     	if (action == 1) {
     		LOGGER.info("start pay order: " + orderId);
-    		for(int i = 0; i < 100000; i++);
+    		for(int i = 0; i < 1000000; i++) {
+    			int j = i * i;
+    		}
     		LOGGER.info("pay order: " + orderId + " succeed");
     	}
         return dbAdapter.updateOrder(orderId, action);
