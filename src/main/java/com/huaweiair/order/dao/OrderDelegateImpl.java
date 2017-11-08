@@ -102,8 +102,8 @@ public class OrderDelegateImpl{
 				public void run() {
 		    		LOGGER.info("start pay order: " + orderId);
 		    		for(int i = 0; i < 1000000; i++) {
-		    			for (long j = 0; j < 100000; j++) {
-		    				for (int k = 0; k < 500000; k++);
+		    			for (long j = 0; j < 10000; j++) {
+		    				for (int k = 0; k < 5; k++);
 		    			}
 		    		}
 		    		LOGGER.info("pay order: " + orderId + " succeed");
